@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Digital Business Card</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background: #f4f4f9; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 350px; width: 100%; text-align: center; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        #qrcode { margin-top: 20px; display: flex; justify-content: center; }
+        .instructions { font-size: 0.8em; color: #666; margin-top: 15px; }
+        h2 { color: #333; margin-bottom: 5px; }
+        .logo { font-weight: bold; font-size: 1.5em; color: #007AFF; margin-bottom: 20px; } /* Edit color to match your brand */
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="logo">YOUR COMPANY</div>
+    <h2>Create Your QR Card</h2>
+    <p style="font-size: 0.9em;">Enter details to generate your scanable contact.</p>
+    
+    <input type="text" id="fname" placeholder="First Name" oninput="generateQR()">
+    <input type="text" id="lname" placeholder="Last Name" oninput="generateQR()">
+    <input type="text" id="title" placeholder="Job Title" oninput="generateQR()">
+    <input type="email" id="email" placeholder="Work Email" oninput="generateQR()">
+    <input type="tel" id="phone" placeholder="Phone Number" oninput="generateQR()">
+
+    <div id="qrcode"></div>
+    
+    <div class="instructions">
+        <strong>To save:</strong> Screenshot this QR code and save it to your "Favorites" or your Home Screen.
+    </div>
+</div>
+
+<script>
+    const qrContainer = document.getElementById("qrcode");
+    const qrcode = new QRCode(qrContainer, { width: 200, height: 200 });
+
+    function generateQR() {
+        const fn = document.getElementById("fname").value;
+        const ln = document.getElementById("lname").value;
+        const title = document.getElementById("title").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+
+        // Standard vCard Format
+        const vcard = `BEGIN:VCARD\nVERSION:3.0\nN:${ln};${fn}\nFN:${fn} ${ln}\nTITLE:${title}\nEMAIL:${email}\nTEL:${phone}\nEND:VCARD`;
+        
+        if(fn || ln) {
+            qrcode.makeCode(vcard);
+        }
+    }
+    // Initial placeholder
+    qrcode.makeCode("Enter details above");
+</script>
+
+</body>
+</html>
