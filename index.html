@@ -14,27 +14,18 @@
             background-size: cover; background-position: center; background-attachment: fixed;
         }
         .card { 
-            background: rgba(255, 255, 255, 0.96); padding: 25px; border-radius: 20px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 400px; width: 90%; text-align: center; margin: 40px 0 20px 0;
+            background: rgba(255, 255, 255, 0.98); padding: 25px; border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 400px; width: 90%; text-align: center; margin: 30px 0;
         }
-        h2 { color: var(--pew-blue); margin: 0 0 15px 0; }
         input { 
-            width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ccc; 
+            width: 100%; padding: 12px; margin: 6px 0; border: 1px solid #ccc; 
             border-radius: 8px; box-sizing: border-box; font-size: 16px;
         }
-        #qrcode { margin-top: 15px; display: flex; justify-content: center; padding: 10px; background: white; border-radius: 10px; }
+        #qrcode { margin-top: 15px; display: flex; justify-content: center; padding: 15px; background: white; border-radius: 10px; border: 1px solid #eee; }
         .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        button { 
-            flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; 
-            font-weight: bold; font-size: 14px; transition: 0.2s;
-        }
+        button { flex: 1; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
         .primary-btn { background-color: var(--pew-blue); color: white; }
         .reset-btn { background-color: #f1f1f1; color: #666; width: 100%; margin-top: 10px; }
-        .info-box { 
-            background: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 15px; 
-            max-width: 400px; width: 90%; margin-bottom: 40px; font-size: 0.85em; color: #333; line-height: 1.5;
-        }
-        .info-box h3 { color: var(--pew-blue); margin-top: 0; font-size: 1.1em; }
         .pew-logo { font-weight: 900; color: var(--pew-blue); letter-spacing: 3px; font-size: 1.6em; margin-bottom: 5px; }
     </style>
 </head>
@@ -42,61 +33,67 @@
 
 <div class="card">
     <div class="pew-logo">PEW</div>
-    <h2>Card Creator</h2>
+    <p style="margin: 0 0 15px 0; color: #666; font-size: 0.9em;">Digital Contact Creator</p>
     
     <input type="text" id="fname" placeholder="First Name" oninput="generateQR()">
     <input type="text" id="lname" placeholder="Last Name" oninput="generateQR()">
-    <input type="text" id="pro" placeholder="Pronouns (e.g. they/them)" oninput="generateQR()">
+    <input type="text" id="pro" placeholder="Pronouns (e.g. he/him)" oninput="generateQR()">
     <input type="text" id="comp" value="Pew" placeholder="Company" oninput="generateQR()">
     <input type="text" id="title" placeholder="Job Title" oninput="generateQR()">
     <input type="email" id="email" placeholder="Work Email" oninput="generateQR()">
-    <input type="tel" id="phone" placeholder="Phone Number" oninput="generateQR()">
+    <input type="tel" id="phone" placeholder="Phone (e.g. +1 234 567 890)" oninput="generateQR()">
     <input type="text" id="li" placeholder="LinkedIn URL" oninput="generateQR()">
 
     <div id="qrcode"></div>
     
     <div class="btn-group">
-        <button class="primary-btn" onclick="downloadQR()">Save QR Image</button>
-        <button class="primary-btn" onclick="downloadVCard()">Save Contact (.vcf)</button>
+        <button class="primary-btn" onclick="downloadQR()">Save QR</button>
+        <button class="primary-btn" onclick="downloadVCard()">Save Contact</button>
     </div>
-    <button class="reset-btn" onclick="resetForm()">Clear Form</button>
-</div>
-
-<div class="info-box">
-    <h3>Instructions for the Team</h3>
-    <strong>1. Create Your Card:</strong> Fill in the fields above. Your QR code updates automatically.<br><br>
-    <strong>2. Save for Sharing:</strong> Click <b>"Save QR Image"</b> and keep it in your phone's "Favorites" album. You can show this QR to anyone to scan.<br><br>
-    <strong>3. Add to Your Own Phone:</strong> Click <b>"Save Contact (.vcf)"</b>. 
-    <ul>
-        <li><b>iPhone:</b> The file will open; tap "Create New Contact" or "Add to Contacts."</li>
-        <li><b>Android:</b> Tap the downloaded file to import it into your Google Contacts.</li>
-    </ul>
-    <strong>4. Sharing with others:</strong> Simply open the QR image you saved. When a client scans it, your professional details (including LinkedIn and Pronouns) will pop up on their screen instantly.
+    <button class="reset-btn" onclick="resetForm()">Clear</button>
 </div>
 
 <script>
     const qrContainer = document.getElementById("qrcode");
-    const qrcode = new QRCode(qrContainer, { 
-        width: 200, height: 200, colorDark: "#002D62", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H 
-    });
+    const qrcode = new QRCode(qrContainer, { width: 220, height: 220, colorDark: "#002D62", correctLevel: QRCode.CorrectLevel.L });
+
+    // This is a placeholder for your image. For technical reasons, we'll use a small trick 
+    // to link the photo.
+    const PHOTO_URL = "https://raw.githubusercontent.com/monkeyjedi/PewBusCards/main/Pew_Background-2023-2%20.png";
 
     function getVCardData() {
-        const fn = document.getElementById("fname").value || "";
-        const ln = document.getElementById("lname").value || "";
-        const pro = document.getElementById("pro").value || "";
-        const comp = document.getElementById("comp").value || "Pew";
-        const title = document.getElementById("title").value || "";
-        const email = document.getElementById("email").value || "";
-        const phone = document.getElementById("phone").value || "";
-        const li = document.getElementById("li").value || "";
+        const fn = document.getElementById("fname").value;
+        const ln = document.getElementById("lname").value;
+        const pro = document.getElementById("pro").value;
+        const comp = document.getElementById("comp").value;
+        const title = document.getElementById("title").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+        const li = document.getElementById("li").value;
 
-        return `BEGIN:VCARD\nVERSION:3.0\nN:${ln};${fn};;;\nFN:${fn} ${ln} ${pro ? '('+pro+')' : ''}\nORG:${comp}\nTITLE:${title}\nEMAIL:${email}\nTEL;TYPE=CELL:${phone}\nURL:${li}\nEND:VCARD`;
+        // Structured vCard 3.0
+        return [
+            "BEGIN:VCARD",
+            "VERSION:3.0",
+            `N:${ln};${fn};;;`,
+            `FN:${fn} ${ln}${pro ? ' ('+pro+')' : ''}`,
+            `ORG:${comp}`,
+            `TITLE:${title}`,
+            `EMAIL;TYPE=INTERNET,WORK:${email}`,
+            `TEL;TYPE=CELL,VOICE:${phone}`,
+            `URL:${li}`,
+            `X-PRONOUNS:${pro}`,
+            `GENDER:${pro}`, // Backup for Android/Older iOS
+            `PHOTO;VALUE=URI:${PHOTO_URL}`,
+            "END:VCARD"
+        ].join("\n");
     }
 
     function generateQR() {
         const data = getVCardData();
         if(document.getElementById("fname").value || document.getElementById("lname").value) {
-            qrcode.clear(); qrcode.makeCode(data);
+            qrcode.clear();
+            qrcode.makeCode(data);
         }
     }
 
@@ -104,13 +101,13 @@
         const img = qrContainer.querySelector("img");
         if(img) {
             const link = document.createElement("a");
-            link.href = img.src; link.download = "Pew_Business_Card_QR.png"; link.click();
+            link.href = img.src; link.download = "Pew_Contact_QR.png"; link.click();
         }
     }
 
     function downloadVCard() {
         const data = getVCardData();
-        const file = new Blob([data], { type: 'text/vcard' });
+        const file = new Blob([data], { type: 'text/vcard;charset=utf-8' });
         const url = URL.createObjectURL(file);
         const link = document.createElement("a");
         link.href = url;
