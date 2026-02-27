@@ -21,7 +21,7 @@
             width: 100%; padding: 12px; margin: 6px 0; border: 1px solid #ccc; 
             border-radius: 8px; box-sizing: border-box; font-size: 16px;
         }
-        #qrcode { margin-top: 15px; display: flex; justify-content: center; padding: 15px; background: white; border-radius: 10px; border: 1px solid #eee; }
+        #qrcode { margin-top: 15px; display: flex; justify-content: center; padding: 15px; background: white; border-radius: 10px; }
         .btn-group { display: flex; gap: 10px; margin-top: 20px; }
         button { flex: 1; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
         .primary-btn { background-color: var(--pew-blue); color: white; }
@@ -33,15 +33,13 @@
 
 <div class="card">
     <div class="pew-logo">PEW</div>
-    <p style="margin: 0 0 15px 0; color: #666; font-size: 0.9em;">Digital Contact Creator</p>
-    
     <input type="text" id="fname" placeholder="First Name" oninput="generateQR()">
     <input type="text" id="lname" placeholder="Last Name" oninput="generateQR()">
-    <input type="text" id="pro" placeholder="Pronouns (e.g. he/him)" oninput="generateQR()">
+    <input type="text" id="pro" placeholder="Pronouns (e.g. they/them)" oninput="generateQR()">
     <input type="text" id="comp" value="Pew" placeholder="Company" oninput="generateQR()">
     <input type="text" id="title" placeholder="Job Title" oninput="generateQR()">
     <input type="email" id="email" placeholder="Work Email" oninput="generateQR()">
-    <input type="tel" id="phone" placeholder="Phone (e.g. +1 234 567 890)" oninput="generateQR()">
+    <input type="tel" id="phone" placeholder="Phone Number" oninput="generateQR()">
     <input type="text" id="li" placeholder="LinkedIn URL" oninput="generateQR()">
 
     <div id="qrcode"></div>
@@ -57,11 +55,7 @@
     const qrContainer = document.getElementById("qrcode");
     const qrcode = new QRCode(qrContainer, { width: 220, height: 220, colorDark: "#002D62", correctLevel: QRCode.CorrectLevel.L });
 
-    // This is a placeholder for your image. For technical reasons, we'll use a small trick 
-    // to link the photo.
-    const PHOTO_URL = "https://raw.githubusercontent.com/monkeyjedi/PewBusCards/main/Pew_Background-2023-2%20.png";
-
-    function getVCardData() {
+    function getVCardData(includePhoto = true) {
         const fn = document.getElementById("fname").value;
         const ln = document.getElementById("lname").value;
         const pro = document.getElementById("pro").value;
@@ -71,26 +65,31 @@
         const phone = document.getElementById("phone").value;
         const li = document.getElementById("li").value;
 
-        // Structured vCard 3.0
-        return [
+        let vcard = [
             "BEGIN:VCARD",
             "VERSION:3.0",
             `N:${ln};${fn};;;`,
-            `FN:${fn} ${ln}${pro ? ' ('+pro+')' : ''}`,
+            `FN:${fn} ${ln}`,
             `ORG:${comp}`,
             `TITLE:${title}`,
+            `NICKNAME:${pro}`, // On iPhones, this often shows right under the name
             `EMAIL;TYPE=INTERNET,WORK:${email}`,
             `TEL;TYPE=CELL,VOICE:${phone}`,
             `URL:${li}`,
-            `X-PRONOUNS:${pro}`,
-            `GENDER:${pro}`, // Backup for Android/Older iOS
-            `PHOTO;VALUE=URI:${PHOTO_URL}`,
-            "END:VCARD"
-        ].join("\n");
+            `NOTE:Pronouns: ${pro}`, // Backup field
+        ];
+
+        if (includePhoto) {
+            // Using the full URL for the photo in the downloadable file
+            vcard.push("PHOTO;VALUE=URI:https://raw.githubusercontent.com/monkeyjedi/PewBusCards/main/Pew_Background-2023-2%20.png");
+        }
+
+        vcard.push("END:VCARD");
+        return vcard.join("\n");
     }
 
     function generateQR() {
-        const data = getVCardData();
+        const data = getVCardData(false);
         if(document.getElementById("fname").value || document.getElementById("lname").value) {
             qrcode.clear();
             qrcode.makeCode(data);
@@ -101,12 +100,12 @@
         const img = qrContainer.querySelector("img");
         if(img) {
             const link = document.createElement("a");
-            link.href = img.src; link.download = "Pew_Contact_QR.png"; link.click();
+            link.href = img.src; link.download = "Pew_QR.png"; link.click();
         }
     }
 
     function downloadVCard() {
-        const data = getVCardData();
+        const data = getVCardData(true);
         const file = new Blob([data], { type: 'text/vcard;charset=utf-8' });
         const url = URL.createObjectURL(file);
         const link = document.createElement("a");
